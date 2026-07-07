@@ -1,0 +1,8 @@
+model,hyperparameters,accuracy_score,f1_score,roc_auc_score
+CatBoosting Classifier,"{'depth': 6, 'iterations': 100, 'learning_rate': 0.05}",0.8858695652173914,0.9014084507042254,0.9427114941133633
+Random Forest,{'n_estimators': 256},0.8858695652173914,0.9014084507042254,0.9416191285350164
+Gradient Boosting,"{'learning_rate': 0.01, 'n_estimators': 256, 'subsample': 0.8}",0.875,0.892018779342723,0.9416191285350164
+XGBClassifier,"{'learning_rate': 0.1, 'n_estimators': 64}",0.875,0.8909952606635071,0.9401626410972205
+AdaBoost Classifier,"{'learning_rate': 0.5, 'n_estimators': 32}",0.8586956521739131,0.8737864077669902,0.9314844034470203
+Logistic Regression,{'C': 0.01},0.8641304347826086,0.8792270531400966,0.9270542541570579
+Decision Tree,{'criterion': 'entropy'},0.8043478260869565,0.8144329896907216,0.8172108265566209

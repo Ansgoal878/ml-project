@@ -1,13 +1,12 @@
 import os
 import sys
 
-import numpy as np 
-import pandas as pd
 import pickle
-from sklearn.metrics import r2_score
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.model_selection import GridSearchCV
 
 from src.exception import CustomException
+from src.logger import logging
 
 def save_object(file_path, obj):
     try:
@@ -20,34 +19,44 @@ def save_object(file_path, obj):
 
     except Exception as e:
         raise CustomException(e, sys)
-    
-def evaluate_models(X_train, y_train, X_test, y_test, models, param):
+
+def evaluate_classification_models(X_train, y_train, X_test, y_test, models, param):
     try:
         report = {}
+        best_params_report = {}
 
-        for i in range(len(list(models))):
-            model = list(models.values())[i]
-            para=param[list(models.keys())[i]]
+        for model_name, model in models.items():
+            para = param[model_name]
 
-            gs = GridSearchCV(model,para,cv=3)
-            gs.fit(X_train,y_train)
+            gs = GridSearchCV(model, para, cv=3, scoring="f1")
+            gs.fit(X_train, y_train)
 
             model.set_params(**gs.best_params_)
-            model.fit(X_train,y_train)
+            model.fit(X_train, y_train)
 
-            #model.fit(X_train, y_train)  # Train model
+            y_pred = model.predict(X_test)
 
-            y_train_pred = model.predict(X_train)
+            if hasattr(model, "predict_proba"):
+                y_score = model.predict_proba(X_test)[:, 1]
+            else:
+                y_score = model.decision_function(X_test)
 
-            y_test_pred = model.predict(X_test)
+            acc = accuracy_score(y_test, y_pred)
+            f1 = f1_score(y_test, y_pred)
+            roc_auc = roc_auc_score(y_test, y_score)
 
-            train_model_score = r2_score(y_train, y_train_pred)
+            report[model_name] = {
+                "accuracy_score": acc,
+                "f1_score": f1,
+                "roc_auc_score": roc_auc,
+            }
+            best_params_report[model_name] = gs.best_params_
 
-            test_model_score = r2_score(y_test, y_test_pred)
+            logging.info(
+                f"{model_name} -> accuracy: {acc:.4f}, f1: {f1:.4f}, roc_auc: {roc_auc:.4f}"
+            )
 
-            report[list(models.keys())[i]] = test_model_score
-
-        return report
+        return report, best_params_report
 
     except Exception as e:
         raise CustomException(e, sys)
