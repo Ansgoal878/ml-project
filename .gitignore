@@ -148,6 +148,11 @@ activemq-data/
 *.sage.py
 
 # Environments
+catboost_info/
+data/*.pkl
+data/*.csv
+__pycache__/
+*.pyc
 .env
 .envrc
 .venv
