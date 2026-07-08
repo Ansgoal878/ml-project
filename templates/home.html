@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heart Risk Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F7F7;
+    --card: #FFFFFF;
+    --ink: #101B22;
+    --muted: #6B7A80;
+    --line: #DCE3E4;
+    --red: #C1272D;
+    --teal: #1B6B72;
+    --teal-soft: #E4EEEE;
+    --red-soft: #FBE9E9;
+    --radius: 10px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a{ color: inherit; }
+
+  .wrap{
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ---------- Header / ECG signature ---------- */
+  header{
+    padding: 48px 0 0;
+  }
+
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin: 0 0 14px;
+  }
+
+  h1{
+    font-family: 'Spectral', serif;
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.15;
+    margin: 0 0 10px;
+    max-width: 14ch;
+  }
+
+  .sub{
+    color: var(--muted);
+    font-size: 15.5px;
+    max-width: 52ch;
+    margin: 0 0 28px;
+    line-height: 1.55;
+  }
+
+  .ecg-band{
+    width: 100%;
+    height: 92px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .ecg-path{
+    fill: none;
+    stroke: var(--red);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 620;
+    stroke-dashoffset: 620;
+    animation: draw 2.6s ease-in-out infinite;
+  }
+
+  .ecg-grid-line{
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+
+  @keyframes draw{
+    0%   { stroke-dashoffset: 620; }
+    55%  { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -620; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .ecg-path{ animation: none; stroke-dashoffset: 0; }
+  }
+
+  /* ---------- Form ---------- */
+  form{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-top: 8px;
+  }
+
+  .section-label{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin: 0 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .section-label:not(:first-child){
+    margin-top: 34px;
+  }
+
+  .grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 24px;
+  }
+
+  .field{
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .field label{
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .field .hint{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: -3px;
+  }
+
+  input, select{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14.5px;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    width: 100%;
+    appearance: none;
+    transition: border-color .15s ease, background .15s ease;
+  }
+
+  select{
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0L5 6L10 0' fill='none' stroke='%236B7A80' stroke-width='1.4'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 30px;
+  }
+
+  input:focus, select:focus{
+    outline: none;
+    border-color: var(--teal);
+    background: #fff;
+    box-shadow: 0 0 0 3px var(--teal-soft);
+  }
+
+  .actions{
+    margin-top: 34px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  button{
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: #fff;
+    background: var(--red);
+    border: none;
+    border-radius: 7px;
+    padding: 13px 26px;
+    cursor: pointer;
+    transition: filter .15s ease, transform .1s ease;
+  }
+
+  button:hover{ filter: brightness(1.06); }
+  button:active{ transform: translateY(1px); }
+
+  button:focus-visible, a:focus-visible{
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
+  }
+
+  .actions .note{
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  /* ---------- Result ---------- */
+  .result{
+    margin-top: 24px;
+    border-radius: var(--radius);
+    padding: 22px 26px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid var(--line);
+  }
+
+  .result.risk{
+    background: var(--red-soft);
+    border-color: #EBC7C8;
+  }
+
+  .result.clear{
+    background: var(--teal-soft);
+    border-color: #C6DEDE;
+  }
+
+  .result .dot{
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .result.risk .dot{ background: var(--red); }
+  .result.clear .dot{ background: var(--teal); }
+
+  .result .label{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .result .value{
+    font-family: 'Spectral', serif;
+    font-size: 19px;
+    font-weight: 600;
+  }
+
+  footer{
+    margin-top: 40px;
+    font-size: 12.5px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  @media (max-width: 640px){
+    .grid{ grid-template-columns: 1fr; }
+    form{ padding: 24px; }
+    .actions{ flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Cardiovascular Risk Model &middot; 11 Clinical Features</p>
+    <h1>Heart Disease Risk Assessment</h1>
+    <p class="sub">
+      Enter the patient's clinical values. The model evaluates the likelihood of heart disease based on 11 indicators, including age, blood pressure, cholesterol, ECG readings, and exercise response.
+    </p>
+
+    <svg class="ecg-band" viewBox="0 0 700 92" preserveAspectRatio="none" aria-hidden="true">
+      <line class="ecg-grid-line" x1="0" y1="46" x2="700" y2="46" />
+      <path class="ecg-path"
+        d="M0,46 L120,46 L138,46 L150,14 L163,78 L178,20 L192,46 L230,46
+           L360,46 L378,46 L390,14 L403,78 L418,20 L432,46 L470,46
+           L600,46 L618,46 L630,14 L643,78 L658,20 L672,46 L700,46" />
+    </svg>
+  </header>
+
+  <form method="POST" action="/predict">
+
+    <p class="section-label">Demographics</p>
+    <div class="grid">
+      <div class="field">
+        <label for="Age">Age</label>
+        <input type="number" id="Age" name="Age" min="1" max="120" placeholder="e.g. 54" required>
+      </div>
+      <div class="field">
+        <label for="Sex">Sex</label>
+        <select id="Sex" name="Sex" required>
+          <option value="" disabled selected>Select</option>
+          <option value="M">Male</option>
+          <option value="F">Female</option>
+        </select>
+      </div>
+    </div>
+
+    <p class="section-label">Vitals</p>
+    <div class="grid">
+      <div class="field">
+        <label for="RestingBP">Resting Blood Pressure</label>
+        <span class="hint">mm Hg</span>
+        <input type="number" id="RestingBP" name="RestingBP" min="0" placeholder="e.g. 130" required>
+      </div>
+      <div class="field">
+        <label for="Cholesterol">Serum Cholesterol</label>
+        <span class="hint">mm/dl</span>
+        <input type="number" id="Cholesterol" name="Cholesterol" min="0" placeholder="e.g. 246" required>
+      </div>
+      <div class="field">
+        <label for="FastingBS">Fasting Blood Sugar &gt; 120 mg/dl?</label>
+        <select id="FastingBS" name="FastingBS" required>
+          <option value="" disabled selected>Select</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="MaxHR">Max Heart Rate</label>
+        <span class="hint">60–202</span>
+        <input type="number" id="MaxHR" name="MaxHR" min="60" max="202" placeholder="e.g. 150" required>
+      </div>
+    </div>
+
+    <p class="section-label">Cardiac Findings</p>
+    <div class="grid">
+      <div class="field">
+        <label for="ChestPainType">Chest Pain Type</label>
+        <select id="ChestPainType" name="ChestPainType" required>
+          <option value="" disabled selected>Select</option>
+          <option value="TA">Typical Angina</option>
+          <option value="ATA">Atypical Angina</option>
+          <option value="NAP">Non-Anginal Pain</option>
+          <option value="ASY">Asymptomatic</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="RestingECG">Resting ECG</label>
+        <select id="RestingECG" name="RestingECG" required>
+          <option value="" disabled selected>Select</option>
+          <option value="Normal">Normal</option>
+          <option value="ST">ST-T Wave Abnormality</option>
+          <option value="LVH">Left Ventricular Hypertrophy</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="ExerciseAngina">Exercise-Induced Angina</label>
+        <select id="ExerciseAngina" name="ExerciseAngina" required>
+          <option value="" disabled selected>Select</option>
+          <option value="Y">Yes</option>
+          <option value="N">No</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="Oldpeak">ST Depression (Oldpeak)</label>
+        <input type="number" id="Oldpeak" name="Oldpeak" step="0.1" placeholder="e.g. 1.5" required>
+      </div>
+      <div class="field">
+        <label for="ST_Slope">Peak Exercise ST Slope</label>
+        <select id="ST_Slope" name="ST_Slope" required>
+          <option value="" disabled selected>Select</option>
+          <option value="Up">Upsloping</option>
+          <option value="Flat">Flat</option>
+          <option value="Down">Downsloping</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit">Assess Risk</button>
+      <span class="note">Results are for reference only and do not replace a clinical diagnosis.</span>
+    </div>
+  </form>
+
+  {% if prediction_text %}
+  <div class="result {{ 'risk' if prediction == 1 else 'clear' }}">
+    <span class="dot"></span>
+    <div>
+      <span class="label">Model Output</span>
+      <span class="value">{{ prediction_text }}</span>
+    </div>
+  </div>
+  {% endif %}
+
+  <footer>Heart Disease Risk Model &middot; 918 patient records &middot; for research &amp; educational use only</footer>
+</div>
+</body>
+</html>
