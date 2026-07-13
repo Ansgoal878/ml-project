@@ -1,0 +1,60 @@
+name: Deploy to AWS Lambda
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  AWS_REGION: ap-east-2
+  LAMBDA_FUNCTION_NAME: heart-risk-app
+  DEPLOY_BUCKET: your-lambda-deploy-bucket
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' 
+
+      - name: Install dependencies into package/
+        run: |
+          mkdir -p package
+          pip install -r requirements.txt -t package/ --no-cache-dir
+
+      - name: Copy application code into package/
+        run: |
+          cp -r src package/
+          cp application.py package/
+          cp lambda_handler.py package/
+          cp -r templates package/
+          if [ -d "data" ]; then cp -r data package/; fi
+
+      - name: Zip deployment package
+        working-directory: package
+        run: zip -r ../deployment.zip . -x "*.pyc" "__pycache__/*"
+
+      - name: Check zip size
+        run: du -h deployment.zip
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload package to S3
+        run: aws s3 cp deployment.zip s3://${{ env.DEPLOY_BUCKET }}/deployment.zip
+
+      - name: Update Lambda function code
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+            --s3-bucket ${{ env.DEPLOY_BUCKET }} \
+            --s3-key deployment.zip
