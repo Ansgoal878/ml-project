@@ -7,7 +7,7 @@ on:
 env:
   AWS_REGION: ap-east-2
   LAMBDA_FUNCTION_NAME: heart-risk-app
-  DEPLOY_BUCKET: your-lambda-deploy-bucket
+  DEPLOY_BUCKET: ansgoal878-lambda-deploy-2026
 
 jobs:
   deploy:
