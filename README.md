@@ -63,6 +63,6 @@ Then open `http://localhost:5000` and use the form to get a prediction.
 │   ├── exception.py              # Custom exception handling
 │   ├── logger.py                 # Logging setup
 │   └── utils.py                  # Shared helpers (save/load objects, evaluation)
-├── templates/                  # HTML templates for the web UI
+├── templates/                  # HTML templates for the web UI 
 └── requirements.txt
 ```

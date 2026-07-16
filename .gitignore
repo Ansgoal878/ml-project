@@ -149,7 +149,6 @@ activemq-data/
 
 # Environments
 catboost_info/
-data/*.pkl
 data/*.csv
 __pycache__/
 *.pyc
